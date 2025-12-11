@@ -24,11 +24,11 @@ class MovieForm(forms.ModelForm):
 
             'description':forms.Textarea(attrs={'class':'form-control','rows':3,'placeholder':'Enter movie description'}),
 
-            'release_date':forms.DateInput(attrs={'class':'form-comtrol','type':'date'}),
+            'release_date':forms.DateInput(attrs={'class':'form-control','type':'date'}),
 
             'industry':forms.Select(attrs= {'class':'form-select'}),
 
-            'runtime':forms.TimeInput(attrs={'class':'form-comtrol','type':'time'},format='%H:%M'),
+            'runtime':forms.TimeInput(attrs={'class':'form-control','type':'time'},format='%H:%M'),
 
             'certification':forms.Select(attrs= {'class':'form-select'}),
 
@@ -36,7 +36,7 @@ class MovieForm(forms.ModelForm):
 
             'artists':forms.SelectMultiple(attrs={'class':'form-select'}),
 
-            'video':forms.TextInput(attrs={'class':'form-comtrol','type':'url','placeholder':'Enter video url'}),
+            'video':forms.TextInput(attrs={'class':'form-control','type':'url','placeholder':'Enter video url'}),
 
             'tags':forms.Textarea(attrs={'class':'form-control','rows':3,'placeholder':'Enter tags with #'}),
 

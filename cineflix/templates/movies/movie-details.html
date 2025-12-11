@@ -7,12 +7,20 @@
   <section class="hero-section" style="background:url('{{movie.photo.url}}') center center/cover no-repeat;">
     <div class="hero-overlay"></div>
     <div class="hero-content">
-      <h1 class="display-5 fw-bold">{{movie.name}}</h1>
+
+      
+      <h1 class="display-5 d-inline-block fw-bold me-3">{{movie.name}}</h1>
+      {% allowed_roles request '["admin"]' as allow %}
+			{% if allow %}
+      <a href="{% url 'movie-edit' movie.uuid %}"><i class="fa fa-solid fa-pen text-white mx-2"></i></a>
+      <a href="{% url 'movie-delete' movie.uuid %}"><i class="fa fa-solid fa-trash text-white mx-2"></i></a>
+      {% endif %}
       <div class="d-flex align-items-center mb-2">
-        <span class="match me-3">{{movie.runtime|time:'H i'}}</span>
+      {% display_time movie.runtime as runtime %}
+        <span class="match me-3">{{runtime}}</span>
         <span class="me-3">{{movie.release_date|date:'Y'}}</span>
         <span class="badge bg-dark me-3 px-3 py-1">{{ movie.certification }}</span>
-        <span>{{movie.industry}}</span>
+        <span>{{movie.industry.name}}</span>
       </div>
       <p class="text-light mb-3">
         {{movie.description}}
@@ -24,9 +32,9 @@
       </div>
 
 
-      <p><strong>Starring:</strong> {% for artist in movie.artists %} {{artist}} {% endfor %}</p>
-      <p><strong>Genres:</strong> {% for gen in movie.genre %} {{gen}} {% endfor%}</p>
-      <p><strong>Available in :</strong> {% for language in movie.languages %} {{language}} {% endfor %}</p>
+      <p><strong>Starring:</strong> {% for artist in movie.artists.all %} {{artist.name}} {% endfor %}</p>
+      <p><strong>Genres:</strong> {% for gen in movie.genre.all %} {{gen.name}} {% endfor%}</p>
+      <p><strong>Available in :</strong> {% for language in movie.languages.all %} {{language.name}} {% endfor %}</p>
     </div>
   </section>
 

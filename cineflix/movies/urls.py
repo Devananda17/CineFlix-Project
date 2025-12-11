@@ -16,4 +16,10 @@ urlpatterns =[
 
     path('movie-details/<str:uuid>/',views.MovieDetailsView.as_view(),name="movie-details"),
 
+    path('movie-edit/<str:uuid>/',views.MovieEditView.as_view(),name="movie-edit"),
+
+    path('movie-delete/<str:uuid>/',views.MovieDeleteView.as_view(),name="movie-delete"),
+
+
+
 ]

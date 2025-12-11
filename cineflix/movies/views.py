@@ -6,6 +6,12 @@ from .models import Movie,IndustryChoices,GenreChoices,ArtistChoices,LanguageCho
 
 from .forms import MovieForm
 
+from django.db.models import Q
+
+from django.utils.decorators import method_decorator
+
+from authentication.permissions import permitted_user_roles
+
 # Create your views here.
 
 class HomeView(View):
@@ -23,10 +29,25 @@ class MovieListView(View):
     template ='movies/movie-list.html'
 
     def get(self,request,*args,**kwargs):
-        
-        movies = Movie.objects.all()
 
-        data = {'page':'Movies','movies':movies}
+        query =request.GET.get('query')
+        
+        movies = Movie.objects.filter(active_status=True)
+
+        if query :
+
+            movies = movies.filter(Q(name__icontains=query)|
+                                   Q(description__icontains=query)|
+                                   Q(industry__name__icontains=query)|
+                                   Q(certification__icontains=query)|
+                                   Q(genre__name__icontains=query)|
+                                   Q(artists__name__icontains=query)|
+                                   Q(languages__name__icontains=query)|
+                                   Q(tags__icontains=query)
+                                  ).distinct()
+            
+
+        data = {'page':'Movies','movies':movies,'query':query}
 
         return render(request,self.template,context=data)
     
@@ -101,7 +122,7 @@ class MovieListView(View):
 
 #         return redirect('movie-list')
 
-
+@method_decorator(permitted_user_roles(['Admin']),name='dispatch')
 class MovieCreateView(View):
 
     form_class = MovieForm
@@ -151,6 +172,7 @@ class MovieCreateView(View):
 
 #         return render(request,self.template,context=data)
     
+
 class MovieDetailsView(View):
 
     template = 'movies/movie-details.html'
@@ -164,3 +186,58 @@ class MovieDetailsView(View):
         data = {'movie': movie,'page':movie.name}
 
         return render(request,self.template,context=data)
+
+@method_decorator(permitted_user_roles(['Admin']),name='dispatch')   
+class MovieEditView(View):
+
+    form_class = MovieForm
+
+    template = 'movies/movie-edit.html'
+
+    def get(self,request,*args,**kwargs):
+
+        uuid = kwargs.get('uuid')
+
+        movie = Movie.objects.get(uuid=uuid)
+
+        form = self.form_class(instance=movie)
+
+        data = {'form':form,'page': movie.name}
+
+        return render(request,self.template,context=data)
+    
+    def post(self,request,*args,**kwargs):
+
+        uuid = kwargs.get('uuid')
+
+        movie = Movie.objects.get(uuid=uuid)
+
+        form = self.form_class(request.POST,request.FILES,instance=movie)
+
+        if form.is_valid():
+
+            form.save()
+
+            return redirect('movie-details',uuid=uuid)
+
+        data = {'form':form,'page':movie.name}
+
+        return render(request,self.template,context=data)
+
+@method_decorator(permitted_user_roles(['Admin']),name='dispatch')
+class MovieDeleteView(View):
+
+    def get(self,request,*args,**kwargs):
+
+        uuid = kwargs.get('uuid')
+
+        movie = Movie.objects.get(uuid=uuid)
+        
+        #hard delete
+        # movie.delete()
+        # soft delete
+        movie.active_status=False
+
+        movie.save()
+
+        return redirect('movie-list')
