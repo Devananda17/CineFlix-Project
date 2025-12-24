@@ -21,6 +21,8 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 
 from .permissions import permitted_user_roles
+
+from django.contrib import messages
 # Create your views here.
 
 class LoginView(View):
@@ -55,11 +57,15 @@ class LoginView(View):
 
                 login(request,user)
 
+                messages.success(request,'login successful')
+
                 return redirect('home')
             
             error = 'Invalid Username or Password'
 
         data = {'form':form,'error':error}
+
+        messages.error(request,'login failed')
         
         return render(request,self.template,context=data)
  
@@ -69,6 +75,8 @@ class LogOutView(View):
     def get(self,request,*args,**kwargs):
 
         logout(request)
+
+        messages.success(request,'logout succesfully')
 
         return redirect('home')
     
